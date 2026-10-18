@@ -6,110 +6,164 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: https://*.wbbasket.ru https://*.wb.ru; font-src 'self'; form-action 'none'; base-uri 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive">
-<meta name="theme-color" content="#0F2747">
+<meta name="theme-color" content="#0d0e10">
 <title>Отчеты Wildberries</title>
 <link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/unbounded-700-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/onest-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<svg width="0" height="0" class="sprite" aria-hidden="true">
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+</svg>
+
 <section id="gate" class="gate">
+  <div class="gate-grid" aria-hidden="true"></div>
   <form id="gateForm" class="gatecard" autocomplete="off">
-    <img src="icon.svg" alt="" class="gatelogo">
-    <h1>Отчеты Wildberries</h1>
+    <div class="mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <h1>Отчеты<br><em>Wildberries</em></h1>
     <p>Данные зашифрованы. Введите пароль, чтобы открыть отчет.</p>
-    <input id="password" type="password" placeholder="Пароль" autocomplete="current-password" required>
-    <button type="submit" id="unlock">Открыть</button>
-    <div id="gateError" class="gateerror" role="alert"></div>
+    <label class="field">
+      <span>Пароль</span>
+      <input id="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button type="submit" id="unlock"><span class="btn-label">Открыть</span><span class="spinner" aria-hidden="true"></span></button>
+    <div id="gateError" class="gateerror" role="alert" aria-live="polite"></div>
+    <div class="gatefoot"><svg class="ic"><use href="#i-lock"/></svg>AES-256, расшифровка только в вашем браузере</div>
   </form>
 </section>
 
-<main id="app" hidden>
-  <header class="hero">
-    <div class="wrap">
-      <div class="hbadge"><span class="dot"></span><span id="updated"></span></div>
-      <h1>Отчет <span>Wildberries</span></h1>
-      <p class="lead" id="periodText"></p>
-      <div class="mtoggle" id="rangeToggle">
-        <button data-days="7">7 дней</button>
-        <button data-days="14">14 дней</button>
-        <button data-days="30" class="on">30 дней</button>
+<div id="app" hidden>
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a class="brand" href="#summary"><span class="brand-dot"></span>WB<span>отчет</span></a>
+      <nav class="nav" aria-label="Разделы">
+        <a href="#summary">Сводка</a><a href="#dynamics">Динамика</a><a href="#products">Товары</a><a href="#ads">Реклама</a><a href="#stock">Склад</a><a href="#insights">Выводы</a>
+      </nav>
+      <div class="seg" id="rangeToggle" role="group" aria-label="Период">
+        <button type="button" data-days="7">7 дн</button><button type="button" data-days="14">14 дн</button><button type="button" data-days="30" class="on">30 дн</button>
+        <i class="seg-thumb" aria-hidden="true"></i>
       </div>
-      <div class="heromini" id="heroKpi"></div>
+      <button type="button" id="lock" class="iconbtn" aria-label="Выйти"><svg class="ic"><use href="#i-lock"/></svg></button>
     </div>
   </header>
 
-  <section class="section">
-    <div class="wrap">
-      <div class="grid k4 kpi" id="kpi"></div>
-    </div>
-  </section>
+  <main>
+    <section class="hero wrap" id="summary">
+      <div class="hero-main reveal">
+        <div class="status"><span class="pulse"></span><span id="updated"></span></div>
+        <div class="hero-label">Заказано за <span id="rangeLabel">30 дней</span></div>
+        <div class="hero-number"><span id="heroOrders">0</span><small>₽</small></div>
+        <div class="hero-delta" id="heroDelta"></div>
+        <div class="spark" id="heroSpark"></div>
+      </div>
+      <div class="hero-side reveal">
+        <div class="forecast" id="forecast"></div>
+        <p class="period" id="periodText"></p>
+      </div>
+    </section>
 
-  <section class="section tight">
-    <div class="wrap">
-      <span class="eyebrow">По дням</span>
-      <h2 class="title">Заказы и выкупы</h2>
-      <p class="subt">Сумма заказов столбиками, выкупы линией. Наведите или нажмите на день.</p>
-      <div class="card chartcard">
-        <div class="legend"><span><i class="lg-orders"></i>Заказы, ₽</span><span><i class="lg-sales"></i>Выкупы, ₽</span></div>
-        <div id="dayChart"></div>
+    <section class="wrap">
+      <div class="kpis" id="kpi"></div>
+    </section>
+
+    <section class="wrap block" id="dynamics">
+      <div class="block-head reveal">
+        <span class="eyebrow">Динамика</span>
+        <h2>Заказы и выкупы по дням</h2>
+        <p>Столбики - сумма заказов, линия - выкупы. Наведите или нажмите на день.</p>
+      </div>
+      <div class="panel chartpanel reveal">
+        <div class="legend"><span><i class="lg-orders"></i>Заказы</span><span><i class="lg-sales"></i>Выкупы</span><span><i class="lg-avg"></i>Среднее за день</span></div>
+        <div class="chartwrap"><div id="dayChart"></div><div class="tip" id="chartTip" hidden></div></div>
         <div class="readout" id="dayReadout"></div>
       </div>
-    </div>
-  </section>
+      <div class="split">
+        <div class="panel reveal">
+          <h3>По дням недели</h3>
+          <p class="hint">Средние заказы в день, видно, когда покупают чаще</p>
+          <div class="weekdays" id="weekdays"></div>
+        </div>
+        <div class="panel reveal">
+          <h3>География</h3>
+          <p class="hint">Топ регионов по заказам за 30 дней</p>
+          <div id="regions"></div>
+        </div>
+      </div>
+    </section>
 
-  <section class="section tight">
-    <div class="wrap">
-      <span class="eyebrow">Товары</span>
-      <h2 class="title">Что продается</h2>
-      <p class="subt">За выбранный период, отсортировано по сумме заказов.</p>
-      <div class="card scroller"><table class="tbl" id="productsTable"></table></div>
-    </div>
-  </section>
+    <section class="wrap block" id="products">
+      <div class="block-head reveal">
+        <span class="eyebrow">Товары</span>
+        <h2>Что продается</h2>
+        <p>За 30 дней. ABC: A - товары, которые дают 80% выручки, C - хвост. Нажмите на заголовок колонки, чтобы отсортировать.</p>
+      </div>
+      <div class="panel scroller reveal">
+        <table class="tbl sortable" id="productsTable"></table>
+      </div>
+      <div class="table-actions"><button type="button" id="exportCsv" class="ghostbtn"><svg class="ic"><use href="#i-download"/></svg>Скачать CSV</button></div>
+    </section>
 
-  <section class="section tight">
-    <div class="wrap">
-      <span class="eyebrow">Реклама</span>
-      <h2 class="title">Рекламные кампании</h2>
-      <p class="subt" id="adsNote"></p>
-      <div class="grid k4 kpi" id="adsKpi"></div>
-      <div class="card scroller spaced"><table class="tbl" id="adsTable"></table></div>
-    </div>
-  </section>
+    <section class="wrap block" id="ads">
+      <div class="block-head reveal">
+        <span class="eyebrow">Реклама</span>
+        <h2>Рекламные кампании</h2>
+        <p id="adsNote"></p>
+      </div>
+      <div class="kpis small" id="adsKpi"></div>
+      <div class="split">
+        <div class="panel reveal">
+          <h3>Воронка рекламы</h3>
+          <p class="hint">Сколько людей дошло до каждого шага, за 30 дней</p>
+          <div class="funnel" id="funnel"></div>
+        </div>
+        <div class="panel reveal">
+          <h3>Расход и заказы с рекламы</h3>
+          <p class="hint">По дням выбранного периода</p>
+          <div id="adChart"></div>
+        </div>
+      </div>
+      <div class="panel scroller reveal spaced"><table class="tbl" id="adsTable"></table></div>
+    </section>
 
-  <section class="section tight">
-    <div class="wrap grid k2">
-      <div>
+    <section class="wrap block" id="stock">
+      <div class="block-head reveal">
         <span class="eyebrow">Склад</span>
-        <h2 class="title">Остатки FBS</h2>
-        <p class="subt">Сколько дней хватит при текущих заказах.</p>
-        <div class="card scroller"><table class="tbl" id="stocksTable"></table></div>
+        <h2>Остатки и дозаказ</h2>
+        <p id="stockNote"></p>
       </div>
-      <div>
-        <span class="eyebrow">География</span>
-        <h2 class="title">Регионы заказов</h2>
-        <p class="subt">Топ-10 за период.</p>
-        <div class="card" id="regions"></div>
-      </div>
-    </div>
-  </section>
+      <div class="stocks" id="stocks"></div>
+    </section>
 
-  <section class="section tight">
-    <div class="wrap">
-      <span class="eyebrow">Выводы</span>
-      <h2 class="title">Главное</h2>
-      <div class="grid k2" id="insights"></div>
+    <section class="wrap block" id="insights">
+      <div class="block-head reveal">
+        <span class="eyebrow">Выводы</span>
+        <h2>Что сделать сейчас</h2>
+        <p>Собрано автоматически по цифрам отчета.</p>
+      </div>
+      <div class="insights" id="insightList"></div>
       <div id="dataErrors" class="errors"></div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <footer class="foot">
-    <div class="wrap">
+    <div class="wrap foot-in">
       <span id="footUpdated"></span>
-      <button type="button" id="lock" class="lockbtn">Выйти</button>
+      <span>Данные из API Wildberries, обновляются автоматически каждые 3 часа</span>
     </div>
   </footer>
-</main>
+</div>
 <script src="crypto.js"></script>
+<script src="charts.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

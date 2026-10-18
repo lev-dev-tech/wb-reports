@@ -2,6 +2,7 @@ const STATISTICS = "https://statistics-api.wildberries.ru";
 const ADVERT = "https://advert-api.wildberries.ru";
 const MARKETPLACE = "https://marketplace-api.wildberries.ru";
 const CONTENT = "https://content-api.wildberries.ru";
+const HISTORY_DAYS = 60;
 const PERIOD_DAYS = 30;
 const ACTIVE_CAMPAIGN_STATUSES = new Set([7, 9, 11]);
 const FULLSTATS_BATCH = 50;
@@ -30,9 +31,9 @@ async function request(url, token, options = {}) {
   }
 }
 
-function periodBounds(now = new Date()) {
+function periodBounds(now = new Date(), length = PERIOD_DAYS) {
   const to = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const from = new Date(to.getTime() - (PERIOD_DAYS - 1) * DAY_MS);
+  const from = new Date(to.getTime() - (length - 1) * DAY_MS);
   return { from: isoDate(from), to: isoDate(to) };
 }
 
@@ -189,9 +190,11 @@ async function section(name, errors, load, fallback) {
 
 export async function collect(token, now = new Date()) {
   const period = periodBounds(now);
+  const history = periodBounds(now, HISTORY_DAYS);
   const errors = [];
-  const orders = await section("Заказы", errors, () => statisticsRows("/api/v1/supplier/orders", token, period), []);
-  const sales = await section("Продажи", errors, () => statisticsRows("/api/v1/supplier/sales", token, period), []);
+  const orders = await section("Заказы", errors, () => statisticsRows("/api/v1/supplier/orders", token, history), []);
+  const sales = await section("Продажи", errors, () => statisticsRows("/api/v1/supplier/sales", token, history), []);
+  const inPeriod = row => String(row.date).slice(0, 10) >= period.from;
   const ads = await section("Реклама", errors, () => advertising(token, period), { campaigns: [], days: [] });
   const cards = await section("Карточки", errors, () => catalog(token), []);
   const stocks = cards.length ? await section("Остатки FBS", errors, () => fbsStocks(token, cards), []) : [];
@@ -199,9 +202,9 @@ export async function collect(token, now = new Date()) {
   return {
     generatedAt: now.toISOString(),
     period,
-    days: dailyTotals(orders, sales, period),
-    products: productTotals(orders, sales).map(product => ({ ...product, ...photos[product.nmId] })),
-    regions: regionTotals(orders),
+    days: dailyTotals(orders, sales, history),
+    products: productTotals(orders.filter(inPeriod), sales.filter(inPeriod)).map(product => ({ ...product, ...photos[product.nmId] })),
+    regions: regionTotals(orders.filter(inPeriod)),
     ads,
     stocks,
     errors,
