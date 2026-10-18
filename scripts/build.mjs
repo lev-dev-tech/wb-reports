@@ -11,9 +11,15 @@ function required(name) {
   return value;
 }
 
+function refuseWithoutOrders(data) {
+  const ordersError = data.errors.find(error => error.section === "Заказы");
+  if (ordersError) throw new Error(`Заказы не получены, оставляю прошлую версию сайта: ${ordersError.message}`);
+}
+
 async function main() {
   const password = required("DASHBOARD_PASSWORD");
   const data = process.argv.includes("--demo") ? demoData() : await collect(required("WB_API_TOKEN"));
+  refuseWithoutOrders(data);
   await mkdir(new URL("../site/", import.meta.url), { recursive: true });
   await writeFile(OUTPUT, JSON.stringify(await seal(data, password)));
   console.log(`Готово: дней ${data.days.length}, товаров ${data.products.length}, кампаний ${data.ads.campaigns.length}, остатков ${data.stocks.length}, ошибок ${data.errors.length}`);

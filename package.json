@@ -2,9 +2,14 @@
   "name": "wb-reports",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "node scripts/build.mjs",
     "demo": "node scripts/build.mjs --demo"
+  },
+  "devDependencies": {
+    "libsodium-wrappers": "0.7.15"
   }
 }

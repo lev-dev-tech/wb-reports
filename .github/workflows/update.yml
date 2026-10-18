@@ -36,6 +36,15 @@ jobs:
           else
             node scripts/build.mjs
           fi
+      - name: Сообщить о сбое в Telegram
+        if: failure()
+        env:
+          ALERT_BOT_TOKEN: ${{ secrets.ALERT_BOT_TOKEN }}
+          ALERT_CHAT_ID: ${{ secrets.ALERT_CHAT_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$ALERT_BOT_TOKEN" ] || [ -z "$ALERT_CHAT_ID" ]; then exit 0; fi
+          curl -s -o /dev/null "https://api.telegram.org/bot${ALERT_BOT_TOKEN}/sendMessage"             --data-urlencode "chat_id=${ALERT_CHAT_ID}"             --data-urlencode "text=Сайт отчетов WB не обновился: ${RUN_URL}"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

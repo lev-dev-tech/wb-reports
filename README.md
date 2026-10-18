@@ -33,3 +33,17 @@ python -m http.server -d site 8080
 - Реклама - `advert-api` `/adv/v1/promotion/count` и `/adv/v3/fullstats` (кампании в работе, на паузе и завершенные).
 - Остатки - `marketplace-api` `/api/v3/warehouses` и `/api/v3/stocks/{склад}` по баркодам из `content-api` `/content/v2/get/cards/list`.
 - Если у токена нет доступа к какому-то разделу, остальное работает, а внизу страницы видно, каких данных нет.
+
+## Управление без браузера
+
+Токен GitHub (fine-grained, только репозиторий `wb-reports`, права Actions, Secrets, Contents, Workflows - Read and write) лежит в `~/.wb-reports/github-token`, в репозиторий не попадает.
+
+```
+npm install
+node scripts/github.mjs secret WB_API_TOKEN путь/к/файлу   # или значение через stdin
+node scripts/github.mjs secrets                              # какие секреты заданы
+node scripts/github.mjs run                                  # обновить сайт сейчас
+node scripts/github.mjs status                               # последние запуски
+```
+
+Если сборка падает, бот присылает ссылку на запуск в Telegram (секреты `ALERT_BOT_TOKEN` и `ALERT_CHAT_ID`). Если WB не отдал заказы, сайт не перезаписывается и остается прошлая версия.
