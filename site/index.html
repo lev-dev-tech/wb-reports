@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: https://*.wbbasket.ru https://*.wb.ru; font-src 'self'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="theme-color" content="#0F2747">
+<title>Отчеты Wildberries</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<section id="gate" class="gate">
+  <form id="gateForm" class="gatecard" autocomplete="off">
+    <img src="icon.svg" alt="" class="gatelogo">
+    <h1>Отчеты Wildberries</h1>
+    <p>Данные зашифрованы. Введите пароль, чтобы открыть отчет.</p>
+    <input id="password" type="password" placeholder="Пароль" autocomplete="current-password" required>
+    <button type="submit" id="unlock">Открыть</button>
+    <div id="gateError" class="gateerror" role="alert"></div>
+  </form>
+</section>
+
+<main id="app" hidden>
+  <header class="hero">
+    <div class="wrap">
+      <div class="hbadge"><span class="dot"></span><span id="updated"></span></div>
+      <h1>Отчет <span>Wildberries</span></h1>
+      <p class="lead" id="periodText"></p>
+      <div class="mtoggle" id="rangeToggle">
+        <button data-days="7">7 дней</button>
+        <button data-days="14">14 дней</button>
+        <button data-days="30" class="on">30 дней</button>
+      </div>
+      <div class="heromini" id="heroKpi"></div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="grid k4 kpi" id="kpi"></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <span class="eyebrow">По дням</span>
+      <h2 class="title">Заказы и выкупы</h2>
+      <p class="subt">Сумма заказов столбиками, выкупы линией. Наведите или нажмите на день.</p>
+      <div class="card chartcard">
+        <div class="legend"><span><i class="lg-orders"></i>Заказы, ₽</span><span><i class="lg-sales"></i>Выкупы, ₽</span></div>
+        <div id="dayChart"></div>
+        <div class="readout" id="dayReadout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <span class="eyebrow">Товары</span>
+      <h2 class="title">Что продается</h2>
+      <p class="subt">За выбранный период, отсортировано по сумме заказов.</p>
+      <div class="card scroller"><table class="tbl" id="productsTable"></table></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <span class="eyebrow">Реклама</span>
+      <h2 class="title">Рекламные кампании</h2>
+      <p class="subt" id="adsNote"></p>
+      <div class="grid k4 kpi" id="adsKpi"></div>
+      <div class="card scroller spaced"><table class="tbl" id="adsTable"></table></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap grid k2">
+      <div>
+        <span class="eyebrow">Склад</span>
+        <h2 class="title">Остатки FBS</h2>
+        <p class="subt">Сколько дней хватит при текущих заказах.</p>
+        <div class="card scroller"><table class="tbl" id="stocksTable"></table></div>
+      </div>
+      <div>
+        <span class="eyebrow">География</span>
+        <h2 class="title">Регионы заказов</h2>
+        <p class="subt">Топ-10 за период.</p>
+        <div class="card" id="regions"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <span class="eyebrow">Выводы</span>
+      <h2 class="title">Главное</h2>
+      <div class="grid k2" id="insights"></div>
+      <div id="dataErrors" class="errors"></div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <span id="footUpdated"></span>
+      <button type="button" id="lock" class="lockbtn">Выйти</button>
+    </div>
+  </footer>
+</main>
+<script src="crypto.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
