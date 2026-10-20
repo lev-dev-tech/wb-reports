@@ -15,13 +15,15 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 const isoDate = date => date.toISOString().slice(0, 10);
 const chunks = (items, size) => Array.from({ length: Math.ceil(items.length / size) }, (_, i) => items.slice(i * size, (i + 1) * size));
 
+const retryDelayMs = response => (Number(response.headers.get("X-Ratelimit-Retry")) || 0) * 1000;
+
 async function request(url, token, options = {}) {
   for (let attempt = 1; attempt <= 3; attempt++) {
     const response = await fetch(url, {
       ...options,
       headers: { Authorization: token, "Content-Type": "application/json", ...(options.headers || {}) },
     });
-    if (response.status === 429 && attempt < 3) {
+    if (response.status === 429 && attempt < 3 && retryDelayMs(response) <= RETRY_PAUSE_MS) {
       await pause(RETRY_PAUSE_MS);
       continue;
     }
