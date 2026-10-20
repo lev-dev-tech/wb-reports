@@ -6,7 +6,7 @@ import sodium from "libsodium-wrappers";
 const REPO = "lev-dev-tech/wb-reports";
 const WORKFLOW = "update.yml";
 const TOKEN_FILE = join(homedir(), ".wb-reports", "github-token");
-const ALLOWED_SECRETS = ["WB_API_TOKEN", "DASHBOARD_PASSWORD", "ALERT_BOT_TOKEN", "ALERT_CHAT_ID"];
+const ALLOWED_SECRETS = ["WB_API_TOKEN", "WB_ADS_TOKEN", "DASHBOARD_PASSWORD", "ALERT_BOT_TOKEN", "ALERT_CHAT_ID"];
 
 function githubToken() {
   const token = readFileSync(TOKEN_FILE, "utf8").trim();

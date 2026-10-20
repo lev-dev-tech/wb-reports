@@ -18,7 +18,7 @@ function refuseWithoutOrders(data) {
 
 async function main() {
   const password = required("DASHBOARD_PASSWORD");
-  const data = process.argv.includes("--demo") ? demoData() : await collect(required("WB_API_TOKEN"));
+  const data = process.argv.includes("--demo") ? demoData() : await collect({ token: required("WB_API_TOKEN"), adsToken: process.env.WB_ADS_TOKEN || undefined });
   refuseWithoutOrders(data);
   await mkdir(new URL("../site/", import.meta.url), { recursive: true });
   await writeFile(OUTPUT, JSON.stringify(await seal(data, password)));

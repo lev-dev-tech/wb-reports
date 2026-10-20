@@ -28,6 +28,7 @@ jobs:
       - name: Собрать и зашифровать данные
         env:
           WB_API_TOKEN: ${{ secrets.WB_API_TOKEN }}
+          WB_ADS_TOKEN: ${{ secrets.WB_ADS_TOKEN }}
           DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
         run: |
           if [ -z "$WB_API_TOKEN" ]; then

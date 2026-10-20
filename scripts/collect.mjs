@@ -188,14 +188,14 @@ async function section(name, errors, load, fallback) {
   }
 }
 
-export async function collect(token, now = new Date()) {
+export async function collect({ token, adsToken = token }, now = new Date()) {
   const period = periodBounds(now);
   const history = periodBounds(now, HISTORY_DAYS);
   const errors = [];
   const orders = await section("Заказы", errors, () => statisticsRows("/api/v1/supplier/orders", token, history), []);
   const sales = await section("Продажи", errors, () => statisticsRows("/api/v1/supplier/sales", token, history), []);
   const inPeriod = row => String(row.date).slice(0, 10) >= period.from;
-  const ads = await section("Реклама", errors, () => advertising(token, period), { campaigns: [], days: [] });
+  const ads = await section("Реклама", errors, () => advertising(adsToken, period), { campaigns: [], days: [] });
   const cards = await section("Карточки", errors, () => catalog(token), []);
   const stocks = cards.length ? await section("Остатки FBS", errors, () => fbsStocks(token, cards), []) : [];
   const photos = Object.fromEntries(cards.map(card => [card.nmId, { photo: card.photo, title: card.title }]));
