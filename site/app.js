@@ -306,7 +306,7 @@
     return {
       views: sum(campaigns, "views"), clicks: sum(campaigns, "clicks"), carts: sum(campaigns, "carts"),
       orders: sum(campaigns, "orders"), spent, ordersSum: sum(campaigns, "ordersSum"),
-      drr: ratio(spent * CNY_TO_RUB, sum(campaigns, "ordersSum")),
+      drr: ratio(spent, sum(campaigns, "ordersSum")),
     };
   }
 
@@ -346,7 +346,7 @@
     const campaigns = state.data.ads.campaigns;
     if (!campaigns.length) { $("adsTable").innerHTML = `<tr><td class="empty">Активных кампаний нет или нет доступа к рекламе</td></tr>`; return; }
     const rows = campaigns.map((campaign, index) => {
-      const drr = ratio(campaign.spent * CNY_TO_RUB, campaign.ordersSum);
+      const drr = ratio(campaign.spent, campaign.ordersSum);
       const drrTone = drr === null ? "p-mute" : drr > DRR_TARGET ? "p-bad" : "p-ok";
       return `<tr style="--i:${index}">
         <td><div class="pname">Кампания ${escapeHtml(campaign.id)}</div><div class="psub">${campaignStatus(campaign.status)}</div></td>
@@ -359,7 +359,7 @@
   }
 
   function renderAds() {
-    $("adsNote").textContent = `Расход в ${AD_CURRENCY}, как в кабинете WB Продвижение. В рублях - по курсу около ${CNY_TO_RUB} ₽. ДРР - доля расхода на рекламу в сумме заказов с нее.`;
+    $("adsNote").textContent = `Расход в ${AD_CURRENCY}, как в кабинете WB Продвижение. В рублях - по курсу около ${CNY_TO_RUB} ₽. ДРР - доля расхода на рекламу в сумме заказов с нее, обе суммы в ${AD_CURRENCY}.`;
     renderAdsKpi();
     renderFunnel();
     $("adChart").innerHTML = Charts.ads(rangeAdDays(), shortDate) || `<div class="empty">Нет данных по рекламе</div>`;
