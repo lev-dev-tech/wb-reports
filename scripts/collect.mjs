@@ -4,6 +4,7 @@ const MARKETPLACE = "https://marketplace-api.wildberries.ru";
 const CONTENT = "https://content-api.wildberries.ru";
 const HISTORY_DAYS = 60;
 const PERIOD_DAYS = 30;
+const RECENT_DAYS = 7;
 const ACTIVE_CAMPAIGN_STATUSES = new Set([7, 9, 11]);
 const FULLSTATS_BATCH = 50;
 const STOCKS_BATCH = 1000;
@@ -88,6 +89,18 @@ function productTotals(orders, sales) {
     product.salesSum += Number(sale.priceWithDisc) || 0;
   }
   return [...products.values()].sort((a, b) => b.ordersSum - a.ordersSum);
+}
+
+function recentOrders(orders, now, days) {
+  const since = isoDate(new Date(Date.parse(periodBounds(now).to) - (days - 1) * DAY_MS));
+  const counts = new Map();
+  for (const order of orders.filter(order => !order.isCancel && String(order.date).slice(0, 10) >= since)) {
+    const day = String(order.date).slice(0, 10);
+    const perDay = counts.get(order.nmId) || {};
+    perDay[day] = (perDay[day] || 0) + 1;
+    counts.set(order.nmId, perDay);
+  }
+  return Object.fromEntries(counts);
 }
 
 function regionTotals(orders) {
@@ -207,6 +220,7 @@ export async function collect({ token, adsToken = token }, now = new Date()) {
     days: dailyTotals(orders, sales, history),
     products: productTotals(orders.filter(inPeriod), sales.filter(inPeriod)).map(product => ({ ...product, ...photos[product.nmId] })),
     regions: regionTotals(orders.filter(inPeriod)),
+    recentOrders: recentOrders(orders, now, RECENT_DAYS),
     ads,
     stocks,
     errors,
